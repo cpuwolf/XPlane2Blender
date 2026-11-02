@@ -14,6 +14,10 @@ from io_xplane2blender.xplane_constants import (
     EXPORT_TYPE_COCKPIT,
 )
 from io_xplane2blender.xplane_ops_dev import *
+from io_xplane2blender.xplane_helpers import (
+    getActionFcurves,
+    removeActionFcurve,
+)
 from io_xplane2blender.xplane_utils import (
     xplane_commands_txt_parser,
     xplane_datarefs_txt_parser,
@@ -58,9 +62,9 @@ def makeKeyframesLinear(obj, path):
     if (
         obj.animation_data != None
         and obj.animation_data.action != None
-        and len(obj.animation_data.action.fcurves) > 0
+        and len(getActionFcurves(obj.animation_data.action)) > 0
     ):
-        fcurve = findFCurveByPath(obj.animation_data.action.fcurves, path)
+        fcurve = findFCurveByPath(getActionFcurves(obj.animation_data.action), path)
 
         if fcurve:
             # find keyframe
@@ -311,11 +315,11 @@ class OBJECT_OT_remove_xplane_dataref(bpy.types.Operator):
         if (
             obj.animation_data != None
             and obj.animation_data.action != None
-            and len(obj.animation_data.action.fcurves) > 0
+            and len(getActionFcurves(obj.animation_data.action)) > 0
         ):
-            fcurve = findFCurveByPath(obj.animation_data.action.fcurves, path)
+            fcurve = findFCurveByPath(getActionFcurves(obj.animation_data.action), path)
             if fcurve:
-                obj.animation_data.action.fcurves.remove(fcurve=fcurve)
+                removeActionFcurve(obj.animation_data.action, fcurve)
 
         return {"FINISHED"}
 
@@ -452,11 +456,11 @@ class BONE_OT_remove_xplane_dataref(bpy.types.Operator):
         if (
             obj.animation_data != None
             and obj.animation_data.action != None
-            and len(obj.animation_data.action.fcurves) > 0
+            and len(getActionFcurves(obj.animation_data.action)) > 0
         ):
-            fcurve = findFCurveByPath(obj.animation_data.action.fcurves, path)
+            fcurve = findFCurveByPath(getActionFcurves(obj.animation_data.action), path)
             if fcurve:
-                obj.animation_data.action.fcurves.remove(fcurve=fcurve)
+                removeActionFcurve(obj.animation_data.action, fcurve)
 
         return {"FINISHED"}
 

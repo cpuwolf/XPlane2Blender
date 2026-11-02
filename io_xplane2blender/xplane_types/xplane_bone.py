@@ -34,7 +34,12 @@ import mathutils
 
 from io_xplane2blender import xplane_constants, xplane_props
 from io_xplane2blender.xplane_config import getDebug
-from io_xplane2blender.xplane_helpers import floatToStr, logger, vec_b_to_x
+from io_xplane2blender.xplane_helpers import (
+    floatToStr,
+    logger,
+    vec_b_to_x,
+    getActionFcurves,
+)
 from io_xplane2blender.xplane_types.xplane_keyframe import XPlaneKeyframe
 from io_xplane2blender.xplane_types.xplane_keyframe_collection import (
     XPlaneKeyframeCollection,
@@ -183,13 +188,13 @@ class XPlaneBone:
                 # bone animation data resides in the armature objects .data block
                 fcurves = [
                     f
-                    for f in blenderObject.data.animation_data.action.fcurves
+                    for f in getActionFcurves(blenderObject.data.animation_data.action)
                     if f.data_path.startswith(f'bones["{bone.name}"].xplane.datarefs')
                 ]
             else:
                 fcurves = [
                     f
-                    for f in blenderObject.animation_data.action.fcurves
+                    for f in getActionFcurves(blenderObject.animation_data.action)
                     if f.data_path.startswith(f"xplane.datarefs")
                 ]
         except AttributeError:

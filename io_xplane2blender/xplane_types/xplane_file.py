@@ -30,6 +30,7 @@ from io_xplane2blender.xplane_types import (
 )
 
 from ..xplane_helpers import (
+    getActionFcurves,
     BlenderParentType,
     ExportableRoot,
     PotentialRoot,
@@ -181,7 +182,7 @@ def _pre_scan_all_keyframes():
         {
             int(kf.co[0])
             for action in bpy.data.actions
-            for fcurve in action.fcurves
+            for fcurve in getActionFcurves(action)
             for kf in fcurve.keyframe_points
             if kf.co[0].is_integer()
         }

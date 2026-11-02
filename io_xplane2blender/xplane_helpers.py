@@ -201,6 +201,40 @@ def round_vec(v: mathutils.Vector, ndigits: int) -> mathutils.Vector:
     return mathutils.Vector(round(comp, ndigits) for comp in v)
 
 
+
+# --- Blender 4.4+ compat (slotted actions): Action.fcurves no longer exists
+def getActionFcurves(action):
+    """Return every F-Curve of an action, slotted or legacy."""
+    if action is None:
+        return []
+    legacy = getattr(action, "fcurves", None)
+    if legacy is not None:
+        return list(legacy)
+    fcurves = []
+    for layer in action.layers:
+        for strip in layer.strips:
+            for bag in strip.channelbags:
+                fcurves.extend(bag.fcurves)
+    return fcurves
+
+
+def removeActionFcurve(action, fcurve):
+    """Remove an F-Curve from a slotted or legacy action."""
+    legacy = getattr(action, "fcurves", None)
+    if legacy is not None:
+        legacy.remove(fcurve=fcurve)
+        return
+    for layer in action.layers:
+        for strip in layer.strips:
+            for bag in strip.channelbags:
+                for f in bag.fcurves:
+                    if f == fcurve or (
+                        f.data_path == fcurve.data_path
+                        and f.array_index == fcurve.array_index
+                    ):
+                        bag.fcurves.remove(f)
+                        return
+
 def vec_b_to_x(v) -> mathutils.Vector:
     return mathutils.Vector((v[0], v[2], -v[1]))
 
