@@ -338,11 +338,10 @@ class OBJECT_OT_add_xplane_dataref_keyframe(bpy.types.Operator):
     def execute(self, context):
         obj = context.object
         path = getDatarefValuePath(self.index)
-        value = obj.xplane.datarefs[self.index].value
-
-        if "XPlane Datarefs" not in obj.animation_data.action.groups:
-            obj.animation_data.action.groups.new("XPlane Datarefs")
-
+        # Don't touch obj.animation_data.action here: on a fresh object there is no
+        # animation data yet, and Blender 5.x removed Action.groups (groups now live
+        # on the slot's channelbag). keyframe_insert() creates whatever is missing,
+        # including the "XPlane Datarefs" group.
         obj.xplane.datarefs[self.index].keyframe_insert(
             data_path="value", group="XPlane Datarefs"
         )
@@ -488,9 +487,8 @@ class BONE_OT_add_xplane_dataref_keyframe(bpy.types.Operator):
 
         groupName = "XPlane Datarefs " + bone.name
 
-        if groupName not in armature.animation_data.action.groups:
-            armature.animation_data.action.groups.new(groupName)
-
+        # See OBJECT_OT_add_xplane_dataref_keyframe: Action.groups is gone in
+        # Blender 5.x, keyframe_insert() creates the group itself.
         armature.data.keyframe_insert(data_path=path, group=groupName)
 
         return {"FINISHED"}
