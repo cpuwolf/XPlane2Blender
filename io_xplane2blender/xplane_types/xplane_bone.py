@@ -44,6 +44,11 @@ from io_xplane2blender.xplane_types.xplane_keyframe import XPlaneKeyframe
 from io_xplane2blender.xplane_types.xplane_keyframe_collection import (
     XPlaneKeyframeCollection,
 )
+from io_xplane2blender.xplane_types.xplane_attribute import (
+    XPlaneAttribute,
+    XPlaneAttributeName,
+)
+from io_xplane2blender.xplane_types.xplane_attributes import XPlaneAttributes
 
 # from xplane_object import XPlaneObject
 
@@ -111,7 +116,45 @@ class XPlaneBone:
         # IMPORTANT NOTE: Show/Hide Datarefs and datarefs without 2 keyframes will not be included and
         # must be accessed via blenderObject.xplane.datarefs!
         self.datarefs: Dict[str, xplane_props.XPlaneDataref] = {}
+
+        # ANIM_show/ANIM_hide (and ANIM_keyframe_loop) belonging to this bone itself.
+        # A Bone is not a Blender Object, so it never gets an XPlaneObject to collect
+        # these into - they are collected here instead and written by
+        # _writeAnimAttributes alongside the XPlaneObject's own anim attributes
+        self.animAttributes = XPlaneAttributes()
+        self.collectShowHideAttributes()
+
         self.collectAnimations()
+
+    def collectShowHideAttributes(self) -> None:
+        """Collects ANIM_show/ANIM_hide from this bone's own datarefs
+
+        Object level show/hide is handled by XPlaneObject.collectAnimAttributes,
+        but that only ever looks at blenderObject.xplane.datarefs. Datarefs
+        attached to a bone live on bone.xplane.datarefs and would otherwise be
+        silently dropped (their transform keyframes come from collectAnimations,
+        which deliberately ignores show/hide).
+        """
+        if self.blenderBone is None:
+            return
+
+        for dataref_index, dataref in enumerate(self.blenderBone.xplane.datarefs):
+            if dataref.anim_type in (
+                xplane_constants.ANIM_TYPE_SHOW,
+                xplane_constants.ANIM_TYPE_HIDE,
+            ):
+                name = "ANIM_" + dataref.anim_type
+                value = (dataref.show_hide_v1, dataref.show_hide_v2, dataref.path)
+                self.animAttributes.add(
+                    XPlaneAttribute(XPlaneAttributeName(name, dataref_index + 1), value)
+                )
+                if dataref.loop > 0:
+                    self.animAttributes.add(
+                        XPlaneAttribute(
+                            XPlaneAttributeName("ANIM_keyframe_loop", dataref_index + 1),
+                            dataref.loop,
+                        )
+                    )
 
     def sortChildren(self) -> None:
         def getWeight(xplaneBone) -> int:
@@ -164,6 +207,14 @@ class XPlaneBone:
             self.isDataRefAnimatedForTranslation()
             or self.isDataRefAnimatedForRotation()
         )
+
+    def hasAnimationAttributes(self) -> bool:
+        """True if this bone's XPlaneObject or the bone itself has ANIM_ attributes
+        (ANIM_show/ANIM_hide/ANIM_keyframe_loop) that need an ANIM_begin/ANIM_end block"""
+        return (
+            self.xplaneObject is not None
+            and len(self.xplaneObject.animAttributes) > 0
+        ) or len(self.animAttributes) > 0
 
     def collectAnimations(self) -> None:
         """
@@ -574,9 +625,7 @@ class XPlaneBone:
                p = None
             """
         isAnimated = self.isAnimated()
-        hasAnimationAttributes = (
-            self.xplaneObject != None and len(self.xplaneObject.animAttributes) > 0
-        )
+        hasAnimationAttributes = self.hasAnimationAttributes()
 
         if not isAnimated and not hasAnimationAttributes:
             return o
@@ -834,6 +883,11 @@ class XPlaneBone:
     def _writeAnimAttributes(self) -> str:
         o = ""
 
+        for name in self.animAttributes:
+            attr = self.animAttributes[name]
+            for i in range(len(attr.value)):
+                o += f"{self.getIndent()}{attr.name}\t{attr.getValueAsString(i=i)}\n"
+
         if self.xplaneObject == None:
             return o
 
@@ -847,9 +901,7 @@ class XPlaneBone:
     def writeAnimationSuffix(self) -> str:
         o = ""
         isAnimated = self.isAnimated()
-        hasAnimationAttributes = (
-            self.xplaneObject != None and len(self.xplaneObject.animAttributes) > 0
-        )
+        hasAnimationAttributes = self.hasAnimationAttributes()
 
         if not isAnimated and not hasAnimationAttributes:
             return o
