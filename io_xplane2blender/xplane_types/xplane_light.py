@@ -18,6 +18,18 @@ from ..xplane_constants import *
 from ..xplane_helpers import floatToStr, logger, vec_b_to_x, vec_x_to_b
 
 
+def param_value(token: str) -> float:
+    """A parameter light's argument, as a float.
+
+    X-Plane 12 writes a photometric INTENSITY in candela with a unit suffix
+    (``300000cd``) - and so does this exporter for an automatic light - so a
+    file we just wrote has to parse back.  The parameters of a LIGHT_PARAM are
+    echoed verbatim, which makes this validation-only, but ``float()`` on the
+    raw token rejected every such line and cancelled the whole export.
+    """
+    return float(token[:-2] if token.endswith("cd") else token)
+
+
 @dataclass
 class _LightSpillCustomParams:
     r: float
@@ -220,7 +232,7 @@ class XPlaneLight(xplane_object.XPlaneObject):
             self.record_completed = parsed_light.best_overload()
             for i, (pformal, pactual) in enumerate(zip(params_formal, params_actual)):
                 try:
-                    float(pactual)
+                    value = param_value(pactual)
                 except ValueError:  # pactual not a float
                     logger.error(
                         f"Parameter {i} ({pactual}) of {self.blenderObject.name} is not a number"
@@ -229,7 +241,7 @@ class XPlaneLight(xplane_object.XPlaneObject):
                 else:
                     try:
                         self.record_completed.replace_parameterization_argument(
-                            pformal, float(pactual)
+                            pformal, value
                         )
                     except ValueError:
                         continue
