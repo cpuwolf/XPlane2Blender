@@ -101,7 +101,7 @@ class XPlaneMaterial:
             mat = self.blenderObject.material_slots[0].material
             self.name = mat.name
             self.blenderMaterial = mat
-            self.options = mat.xplane  # type: xplane_props.XPlaneMaterialSettings
+            self.options = mat.xplane  # type: io_xplane2blender.xplane_props.XPlaneMaterialSettings
 
             if mat.xplane.draw:
                 self.attributes["ATTR_draw_enable"].setValue(True)

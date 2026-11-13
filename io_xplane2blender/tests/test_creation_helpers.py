@@ -315,18 +315,20 @@ def create_datablock_collection(
     try:
         coll: bpy.types.Collection = bpy.data.collections[name]
     except (KeyError, TypeError):
-        coll: bpy.types.Collection = bpy.data.collections.new(name)
+        coll = bpy.data.collections.new(name)
+    # distinct locals: reusing the parameter names here read as a redeclaration
+    # of `scene` / `parent` and hid what the rest of the function works on
     try:
-        scene: bpy.types.Scene = bpy.data.scenes[scene]
+        scene_dblock: bpy.types.Scene = bpy.data.scenes[scene]
     except (KeyError, TypeError):  # scene is str and not found or is None
-        scene: bpy.types.Scene = bpy.context.scene
+        scene_dblock = bpy.context.scene
     try:
-        parent: bpy.types.Collection = bpy.data.collections[parent]
+        parent_coll: bpy.types.Collection = bpy.data.collections[parent]
     except (KeyError, TypeError):  # parent is str and not found or is Collection
-        parent: bpy.types.Collection = scene.collection
+        parent_coll = scene_dblock.collection
 
-    if coll.name not in parent.children:
-        parent.children.link(coll)
+    if coll.name not in parent_coll.children:
+        parent_coll.children.link(coll)
 
     return coll
 

@@ -3,7 +3,7 @@ import platform
 import re
 from collections import OrderedDict
 from pathlib import Path
-from typing import List
+from typing import TYPE_CHECKING, List
 
 import bpy
 
@@ -22,6 +22,9 @@ from .xplane_attribute import XPlaneAttribute, XPlaneAttributeName
 from .xplane_attributes import XPlaneAttributes
 
 from ..xplane_utils.xplane_effective_gloss import get_effective_gloss
+
+if TYPE_CHECKING:  # annotation only: xplane_file imports this module
+    from io_xplane2blender.xplane_types.xplane_file import XPlaneFile
 
 
 class XPlaneHeader:

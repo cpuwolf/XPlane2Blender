@@ -7,7 +7,7 @@ Created on Jan 30, 2018
 import collections
 import decimal
 import typing
-from typing import Callable, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Callable, List, Optional, Tuple, Union
 
 import bpy
 from mathutils import Vector
@@ -19,12 +19,16 @@ from io_xplane2blender.xplane_props import (
     XPlaneAxisDetentRange,
     XPlaneManipulatorSettings,
 )
+
 from io_xplane2blender.xplane_types.xplane_attribute import XPlaneAttribute
 from io_xplane2blender.xplane_types.xplane_bone import XPlaneBone
 from io_xplane2blender.xplane_types.xplane_keyframe import XPlaneKeyframe
 from io_xplane2blender.xplane_types.xplane_keyframe_collection import (
     XPlaneKeyframeCollection,
 )
+
+if TYPE_CHECKING:  # annotation only: xplane_primitive imports this module
+    from io_xplane2blender.xplane_types.xplane_primitive import XPlanePrimitive
 
 
 def round_vector(vec, ndigits=5) -> Vector:

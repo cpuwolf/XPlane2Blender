@@ -2,7 +2,7 @@ import array
 import collections
 import re
 import time
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import bpy
 import mathutils

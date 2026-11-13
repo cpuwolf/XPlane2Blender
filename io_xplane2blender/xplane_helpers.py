@@ -3,7 +3,7 @@ import itertools
 import os
 import re
 from datetime import timezone
-from typing import Iterable, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Iterable, List, Optional, Tuple, Union
 from pathlib import Path
 
 import bpy
@@ -12,6 +12,9 @@ import mathutils
 import io_xplane2blender
 from io_xplane2blender import xplane_config, xplane_constants, xplane_props
 from io_xplane2blender.xplane_constants import PRECISION_OBJ_FLOAT
+
+if TYPE_CHECKING:  # annotations only: a real import here would be a cycle
+    from io_xplane2blender.xplane_types import xplane_file
 
 """
 Given the difficulty in keeping all these words straight, these
@@ -516,7 +519,7 @@ class VerStruct:
             else:
                 return None
         else:
-            if re.search("[^\d.]", version_str) is not None:
+            if re.search(r"[^\d.]", version_str) is not None:
                 return None
             else:
                 version_struct.addon_version = tuple(

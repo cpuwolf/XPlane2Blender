@@ -38,13 +38,14 @@ import functools
 import itertools
 import pprint
 import re
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 import bpy
 from bpy.app.handlers import persistent
 
 import io_xplane2blender
 from io_xplane2blender import xplane_constants, xplane_helpers, xplane_props
+
 from io_xplane2blender.xplane_constants import (
     BLEND_GLASS,
     LOGGER_LEVEL_ERROR,
@@ -53,6 +54,9 @@ from io_xplane2blender.xplane_constants import (
 )
 from io_xplane2blender.xplane_helpers import XPlaneLogger
 from io_xplane2blender.xplane_utils import xplane_updater_helpers
+
+if TYPE_CHECKING:  # annotation only
+    from io_xplane2blender.xplane_props import XPlaneLayer
 
 
 def _layers_to_collection(logger: xplane_helpers.XPlaneLogger) -> None:
@@ -68,7 +72,7 @@ def _layers_to_collection(logger: xplane_helpers.XPlaneLogger) -> None:
     # --- Copy Layers to Collections ---------------------------------------
     def prepare_collections_for_renaming():
         for coll in bpy.data.collections:
-            full_match = re.fullmatch("Collection(\.\d{3}|$)", coll.name)
+            full_match = re.fullmatch(r"Collection(\.\d{3}|$)", coll.name)
             if full_match:
                 coll.name = f"Collection 1{full_match.group(1)}"
 

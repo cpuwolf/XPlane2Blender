@@ -1,11 +1,14 @@
 import copy
-from typing import Tuple
+from typing import TYPE_CHECKING, Tuple
 
 import bpy
 import mathutils
 
 from io_xplane2blender import xplane_helpers
 from io_xplane2blender.xplane_constants import PRECISION_KEYFRAME
+
+if TYPE_CHECKING:  # annotation only: xplane_bone imports this module
+    from io_xplane2blender.xplane_types.xplane_bone import XPlaneBone
 
 
 class XPlaneKeyframe:

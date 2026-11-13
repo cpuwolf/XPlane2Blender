@@ -46,7 +46,7 @@ class MATERIAL_PT_xplane(bpy.types.Panel):
     bl_context = "material"
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         if context.material:
             return True
 
@@ -73,7 +73,7 @@ class RENDER_PT_xplane(bpy.types.Panel):
     bl_context = "render"
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         return int(context.scene.xplane.version) >= 1200
 
     def draw(self, context):
@@ -115,7 +115,7 @@ class SCENE_PT_xplane(bpy.types.Panel):
     bl_context = "scene"
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         return True
 
     def draw(self, context):
@@ -176,7 +176,7 @@ class OBJECT_PT_xplane(bpy.types.Panel):
     bl_context = "object"
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         obj = context.object
 
         if obj.type in ("MESH", "EMPTY", "ARMATURE", "LIGHT"):
@@ -225,7 +225,7 @@ class BONE_PT_xplane(bpy.types.Panel):
     bl_context = "bone"
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         bone = context.bone
 
         if bone:
