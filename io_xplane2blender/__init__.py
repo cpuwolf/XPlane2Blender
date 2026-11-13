@@ -31,28 +31,18 @@ bl_info = {
     "category": "Import-Export",
 }
 
-if "" not in locals():
-
-    from . import xplane_ui
-    from . import xplane_props
-    from . import xplane_export
-    from . import xplane_ops
-    from . import xplane_ops_dev
-    from . import xplane_config
-    from . import xplane_updater
-    from .xplane_utils import xplane_lights_txt_parser
-    from .xplane_utils import xplane_wiper_gradient
-else:
-    import importlib
-    xplane_ui      = importlib.reload(xplane_ui)
-    xplane_props   = importlib.reload(xplane_props)
-    xplane_export  = importlib.reload(xplane_export)
-    xplane_ops     = importlib.reload(xplane_ops)
-    xplane_ops_dev = importlib.reload(xplane_ops_dev)
-    xplane_config  = importlib.reload(xplane_config)
-    xplane_updater = importlib.reload(xplane_updater)
-    xplane_lights_txt_parser = importlib.reload(xplane_lights_txt_parser)
-    xplane_wiper_gradient = importlib.reload(xplane_wiper_gradient)
+# Plain imports: the upstream reload branch was guarded by `if "" not in
+# locals()`, which is always true, so it never ran - and it is the only reason
+# a reader (or a type checker) had to think these names might be unbound.
+from . import xplane_ui
+from . import xplane_props
+from . import xplane_export
+from . import xplane_ops
+from . import xplane_ops_dev
+from . import xplane_config
+from . import xplane_updater
+from .xplane_utils import xplane_lights_txt_parser
+from .xplane_utils import xplane_wiper_gradient
 
 
 # Function: menu_func

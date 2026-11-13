@@ -269,7 +269,9 @@ def check_bone_parent_is_animated_for_translation(
     bone: XPlaneBone, log_errors: bool = True
 ) -> bool:
     assert bone.parent
-    if not check_bone_is_animated_for_translation(bone.parent, log_errors, manipulator):
+    # the callee asserts a manipulator whenever log_errors is on, and this
+    # function has none to hand it: check quietly, like its rotation twin does
+    if not check_bone_is_animated_for_translation(bone.parent, False):
         if log_errors:
             logger.error(
                 "{}'s parent {} must be animated with location keyframes".format(
