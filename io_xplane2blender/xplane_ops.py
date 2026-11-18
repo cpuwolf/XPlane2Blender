@@ -994,8 +994,9 @@ class XPLANE_OT_bake_wiper_gradient_texture(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.active_object.xplane.isExportableRoot:
-            active_root = context.active_object
+        active = context.active_object
+        if active is not None and active.xplane.isExportableRoot:
+            active_root = active
         elif context.collection.xplane.is_exportable_collection:
             active_root = context.collection
         else:

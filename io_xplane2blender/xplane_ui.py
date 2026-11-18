@@ -80,8 +80,9 @@ class RENDER_PT_xplane(bpy.types.Panel):
         def draw_bake_op(layout: bpy.types.UILayout):
             scene = context.scene
             row = layout.row()
-            if context.active_object.xplane.isExportableRoot:
-                active_root = context.active_object
+            active = context.active_object
+            if active is not None and active.xplane.isExportableRoot:
+                active_root = active
             elif context.collection.xplane.is_exportable_collection:
                 active_root = context.collection
             else:
